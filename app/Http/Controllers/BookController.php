@@ -91,8 +91,8 @@ class BookController extends Controller
      *
      * @param Request $request
      */
-    public function updateBookData(Request $request) {
-
+    public function updateBookData(Request $request)
+    {
         $request->validate([
             'bookId' => ['required'],
         ]);
@@ -140,7 +140,8 @@ class BookController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function create(Request $request) {
+    public function create(Request $request)
+    {
         $postData = $request->validate([
             'name' => ['required', 'string']
         ]);
