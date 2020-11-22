@@ -8,21 +8,25 @@ use App\Models\UsersWithExtraAccess;
 use http\Client\Response;
 use Illuminate\Http\Request;
 use App\Models\Author;
+use Illuminate\Support\Facades\DB;
 use MarcinOrlowski\ResponseBuilder\ResponseBuilder as RB;
 use App\Helpers\ApiCode;
 
 class BookController extends Controller
 {
-
     /**
-     * Table connecting by id books and it's author
+     * Maximum of books getting per load
+     * @var int
      */
-    const BOOK_AUTHOR_TABLE = 'book_authors';
-
     private int $itemsPerPage = 10;
 
     /**
-     * Load list of all books
+     * Table connecting books and its' authors
+     */
+    const BOOK_AUTHORS_TABLE = 'book_authors';
+
+    /**
+     * Load list of all books from certain ID
      *
      * @param Request $request
      * @param int $lastLoadedId
@@ -38,43 +42,16 @@ class BookController extends Controller
 
         $result = $books->toArray();
 
-
-
-//        $ba = $books->authors()->get();
-//
-//        $baa = (array) $ba;
-//        /*s*/echo '$baa= <pre>' . print_r($baa, true). '</pre>'; //todo r
-//        exit;
-
         foreach ($books as $bookId => $book) {
             $authors = $book->authors()->get()->keyBy('id');
             $result[$bookId]['authors'] = $authors;
-
-//            $Authors = new Author();
-//
-//
-//            $bookId = $book['id'];
-//
-//            $loadedAuthors = $Authors->leftJoin(self::BOOK_AUTHOR_TABLE, function ($bookAuthorsHandler) {
-//
-//                $bookAuthorsHandler->on('book_authors.author_id', '=', 'authors.id');
-//            })->select('authors.*')
-//                ->where('book_authors.book_id', '=', $bookId)
-//                ->get()->keyBy('id')->toArray();
-//
-//            $element = $book;
-//            $authors = array_combine(array_column($loadedAuthors, 'id'), $loadedAuthors);
-////            $element['authors'] = $authors;
-//            $element['authors'] = $loadedAuthors;
-//
-//            $result[] = $element;
         }
 
         return RB::success(['data' => $result]);
     }
 
     /**
-     *
+     * Loads books's info by id
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -116,59 +93,46 @@ class BookController extends Controller
      */
     public function updateBookData(Request $request) {
 
-        /*
-                 $data = $this->validate($request, [
-            "name" => 'required|string|max:255',
-            "last_name" => 'required|string|max:255',
+        $request->validate([
+            'bookId' => ['required'],
         ]);
-        $author->update($data);
-        $author->books()->attach(Book::find($request->books_id));
-         */
-        $user = auth()->user();
 
-        $editingBookName = request()->post('editingBookName');
-        $authorsToDelete = request()->post('authorsToDelete');
-        $authorsToAdd = request()->post('authorsToAdd');
-        $bookId = request()->post('bookId');
-        $token = request()->post('token');
+        $editingBookName = $request->post('editingBookName', '');
+        $authorsToDelete = $request->post('authorsToDelete', []);
+        $authorsToAdd = $request->post('authorsToAdd', []);
+        $bookId = $request->post('bookId');
 
-        // Only certain users have access for this operation
-        if ($user) {
-            $userId = $user->getAuthIdentifier();
-            $UsersWithExtraAccess = new UsersWithExtraAccess();
-            $isExtraUser = $UsersWithExtraAccess->select('*')->where('user_id', $userId)->count();
+        $Book = new Book();
+        $updateResult = false;
 
-            if (!empty($isExtraUser)) {
-                $Book = new Book();
-                $updateResult = $Book->where('id', $bookId)->update(['name' => $editingBookName]);
+        if ($editingBookName) {
+            $updateResult = $Book->where('id', $bookId)->update(['name' => $editingBookName]);
+        }
 
-                if ($updateResult) {
-                    if (!empty($authorsToDelete)) {
-                        $BooksAuthors = new BookAuthor();
-                        $authorsToDelete = array_keys($authorsToDelete);
-                        $updateResult = $BooksAuthors->where('book_id', $bookId)->whereIn('author_id', $authorsToDelete)->delete();
-                    }
-
-                    if (!empty($authorsToAdd)) {
-                        foreach ($authorsToAdd as $authorId => $value) {
-                            $BooksAuthors = new BookAuthor();
-                            $BooksAuthors->book_id = $bookId;
-                            $BooksAuthors->author_id = $authorId;
-                            $BooksAuthors->save();
-                        }
-                    }
-                    return ['response_type' => 'ok', 'data' => $updateResult];
-                } else {
-                    return ['response_type' => 'book title update error'];
-                }
-            } else {
-                return ['type' => 'warning_message', 'message' => 'user do not have access to this operation'];
+        if ($updateResult || !$editingBookName) {
+            if (!empty($authorsToDelete)) {
+                $BooksAuthors = new BookAuthor();
+                $authorsToDeleteIds = array_keys($authorsToDelete);
+                $BooksAuthors->where('book_id', $bookId)
+                    ->whereIn('author_id', $authorsToDeleteIds)->delete();
             }
 
+            if (!empty($authorsToAdd)) {
+                $insertData = [];
+                foreach ($authorsToAdd as $authorId => $value) {
+                    $insertData[] = [
+                        'author_id' => $authorId,
+                        'book_id' => $bookId
+                    ];
+                }
+                DB::table(self::BOOK_AUTHORS_TABLE)->insert($insertData);
+            }
+            return RB::success();
         } else {
-            return ['type' => 'error', 'message' => 'user data loading error'];
+            return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
         }
     }
+
 
     /**
      * Creates new Book
@@ -192,5 +156,4 @@ class BookController extends Controller
             return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
         }
     }
-
 }

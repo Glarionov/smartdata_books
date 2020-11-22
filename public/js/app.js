@@ -72591,7 +72591,7 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
               case 0:
                 from = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : 0;
                 _context3.next = 3;
-                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/list/' + from).then(function (result) {
+                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/list/' + from + '?token=' + localStorage.getItem('authToken')).then(function (result) {
                   if (result.hasOwnProperty('data') && Object.keys(result.data).length !== 0) {
                     result = result.data;
                     /*s*/

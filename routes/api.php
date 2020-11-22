@@ -6,14 +6,14 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\AuthController;
 
 Route::group([
-    'middleware' => 'api',
+    'middleware' => ['api', 'requireSpecialAccess'],
     'prefix' => '/v1/books/'
 
 ], function($router) {
     Route::post('/update', [BookController::class, 'updateBookData']);
     Route::post('/create', [BookController::class, 'create']);
     Route::get('/{id}', [BookController::class, 'loadById']);
-    Route::get('/list/{id}', [BookController::class, 'loadAll']);
+    Route::get('/list/{id}', [BookController::class, 'loadFromId']);
     Route::delete('/{id}', [BookController::class, 'deleteById']);
 });
 
@@ -38,5 +38,5 @@ Route::group([
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('register', [AuthController::class, 'register']);
     Route::post('refresh', [AuthController::class, 'refresh']);
-    Route::post('user-profile', [AuthController::class, 'userProfile']);
+    Route::post('user-profile', [AuthController::class, 'userProfile'])->middleware('requireSpecialAccess');
 });

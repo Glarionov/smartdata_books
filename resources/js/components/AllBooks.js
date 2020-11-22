@@ -64,7 +64,8 @@ class AllBooks extends React.Component {
 
 
     async loadBooks(from = 0) {
-        await RequestHandler.makeRequest('books/list/' + from)
+
+        await RequestHandler.makeRequest('books/list/' + from + '?token=' + localStorage.getItem('authToken'))
             .then(result => {
                     if (result.hasOwnProperty('data') && Object.keys(result.data).length !== 0) {
                         result = result.data;
