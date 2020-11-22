@@ -40,10 +40,11 @@ class SingleBook extends React.Component {
 
         await RequestHandler.makeRequest('books/' + id)
             .then(result => {
-                    if (Object.keys(result).length !== 0) {
+                /*s*/console.log('11result=', result); //todo r
+                    if (Object.keys(result.data).length !== 0) {
 
                         this.setState({
-                            book: result
+                            book: result.data
                         });
 
                     } else {

@@ -8,6 +8,27 @@ class AuthorsForAdmin extends React.Component {
     render() {
         return (
             <div className="authors-for-admin-wrapper">
+                <div className="author-info">
+                    <div className="author-name">
+                        <form onSubmit={this.addNewAuthor.bind(this)}>
+                            <input type="text"
+                                   value={this.state.newFirstName}
+                                   onChange={this.handleNewFirstNameEditing.bind(this)}
+                                   title="First name"
+                            />
+                            <input type="text"
+                                   className="input-with-margin"
+                                   value={this.state.newLastName}
+                                   onChange={this.handleNewLastNameEditing.bind(this)}
+                                   title="Last name"
+                            />
+                            <input type="submit"
+                                   className="ellipse-button input-with-margin" value="Add new author"/>
+                        </form>
+
+                    </div>
+                </div>
+
                 {Object.entries(this.state.authors).map(([authorIndex, author]) => (
                     <div className="author-info" key={authorIndex}>
                         <div className="author-name">
@@ -29,7 +50,7 @@ class AuthorsForAdmin extends React.Component {
 
                         </div>
                         <div className="author-amount-of-books">
-                            Wrote <b>{author.book_amount}</b> books
+                            Wrote <b>{author.books_count}</b> books
                         </div>
 
                         <div className="delete-book-icon delete-icon" title="Delete author" onClick={this.deleteAuthor.bind(this, authorIndex)}>
@@ -44,6 +65,8 @@ class AuthorsForAdmin extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            newFirstName: '',
+            newLastName: '',
             authors: {}
         };
     }
@@ -51,7 +74,7 @@ class AuthorsForAdmin extends React.Component {
     async componentDidMount() {
         await RequestHandler.makeRequest('authors/load-for-admin')
             .then(authors => {
-                this.setState({authors});
+                this.setState({authors: authors['data']});
             })
     }
 
@@ -81,6 +104,30 @@ class AuthorsForAdmin extends React.Component {
 
             })
 
+    }
+
+    handleNewFirstNameEditing(event) {
+        this.setState({newFirstName: event.target.value});
+    }
+
+    handleNewLastNameEditing(event) {
+        this.setState({newLastName: event.target.value});
+    }
+
+    async addNewAuthor(event) {
+        event.preventDefault();
+
+        let data = {
+            firstName: this.state.newFirstName,
+            lastName: this.state.newLastName,
+        }
+
+        await RequestHandler.makeRequest('authors/create/'
+            , {data, token: localStorage.getItem('authToken')})
+            .then(response => {
+                /*s*/console.log('response=', response); //todo r
+            }).catch(err => {
+            });
     }
 
     handleFirstNameEdit(index, event) {

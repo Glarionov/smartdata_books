@@ -186,7 +186,9 @@ class Header extends React.Component {
 
         await RequestHandler.makeRequest('auth/login', {login, password})
             .then(result => {
+                /*s*/console.log('result=', result); //todo r
                 if (result.error) {
+
                     switch (result.type) {
                         case 'warning_message':
                                 if (result.message === 'no user by login') {
@@ -197,7 +199,7 @@ class Header extends React.Component {
                             break;
                     }
                 } else {
-                    this.handleLoginSuccess(result.original, result.special_access);
+                    this.handleLoginSuccess(result);
                 }
             });
     }
@@ -247,21 +249,23 @@ class Header extends React.Component {
                             break;
                     }
                 } else {
-                    this.handleLoginSuccess(result.original, result.special_access);
+                    this.handleLoginSuccess(result, result.special_access);
                 }
             });
     }
 
     handleLoginSuccess(userData, specialAccess = false) {
 
-        let token = userData.access_token;
-        let userId = userData.user.id;
-        let login = userData.user.login;
+        /*s*/console.log('userData=', userData); //todo r
+
+        let token = userData.data.access_token;
+        let userId = userData.data.user.id;
+        let login = userData.data.user.login;
 
         localStorage.setItem('authToken', token);
         localStorage.setItem('userId', userId);
         localStorage.setItem('login', login);
-        localStorage.setItem('specialAccess', specialAccess);
+        localStorage.setItem('specialAccess', userData.data.specialAccess);
 
         this.props.changeUser(userId, specialAccess);
 

@@ -66,7 +66,8 @@ class AllBooks extends React.Component {
     async loadBooks(from = 0) {
         await RequestHandler.makeRequest('books/list/' + from)
             .then(result => {
-                    if (result.length) {
+                    if (result.data) {
+                        result = result.data;
                         this.setState({
                             books: [...this.state.books, ...result],
                             lastLoadedId: result[result.length - 1]['id']

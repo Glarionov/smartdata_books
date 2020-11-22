@@ -22,10 +22,11 @@ Route::group([
     'prefix' => '/v1/authors/'
 
 ], function($router) {
-    Route::post('/update', [AuthorController::class, 'updateAuthorData']);
+    Route::post('/create', [AuthorController::class, 'create'])->middleware('requireSpecialAccess');
+    Route::post('/update', [AuthorController::class, 'updateAuthorData'])->middleware('requireSpecialAccess');
     Route::post('/load-by-substring', [AuthorController::class, 'loadBySubstring']);
     Route::get('/load-for-admin', [AuthorController::class, 'loadForAdmin']);
-    Route::delete('delete/{id}', [AuthorController::class, 'deleteById']);
+    Route::delete('delete/{id}', [AuthorController::class, 'deleteById'])->middleware('requireSpecialAccess');
 });
 
 Route::group([

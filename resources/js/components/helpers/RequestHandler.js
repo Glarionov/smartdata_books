@@ -60,11 +60,14 @@ class RequestHandler {
         let loadedData = {};
 
         let callBackFunction = async function (requestResponse) {
+            /*s*/console.log('requestResponse=', requestResponse); //todo r
+
             if (requestResponse.statusText !== 'OK' || requestResponse.status !== 200 || !requestResponse.hasOwnProperty('data')) {
                 throw new Error(`Bad result`);
             } else {
                 let responseData = requestResponse.data;
-                if (responseData.hasOwnProperty('response_type') && responseData.response_type === 'ok' && responseData.hasOwnProperty('data')) {
+                /*s*/console.log('responseData=', responseData); //todo r
+                if (responseData.hasOwnProperty('success') && responseData.success === true && responseData.hasOwnProperty('data')) {
 
                     if (responseData.data) {
                         return responseData.data;

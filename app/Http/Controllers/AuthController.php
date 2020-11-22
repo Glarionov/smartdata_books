@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 //use Dotenv\Validator;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use MarcinOrlowski\ResponseBuilder\ResponseBuilder as RB;
+use App\Helpers\ApiCode;
 
 
 class AuthController extends Controller {
@@ -46,10 +48,13 @@ class AuthController extends Controller {
             }
         }
 
-        $userDataObject = (array) $userData;
-        $userDataObject['special_access'] = $specialAccess;
+        $userDataArray =  (array) $userDataObject;
+        $userDataArray['special_access'] = $specialAccess;
+        $userDataArray['user'] = (array) $userDataArray['user'];
 
-        return response()->json(['response_type' => 'ok', 'data' => $userDataObject]);
+        return RB::success(['data' => $userDataArray]);
+
+//        return response()->json(['response_type' => 'ok', 'data' => $userDataObject]);
     }
 
     /**

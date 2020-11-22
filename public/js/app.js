@@ -72602,7 +72602,9 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
                 from = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : 0;
                 _context3.next = 3;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/list/' + from).then(function (result) {
-                  if (result.length) {
+                  if (result.data) {
+                    result = result.data;
+
                     _this3.setState({
                       books: [].concat(_toConsumableArray(_this3.state.books), _toConsumableArray(result)),
                       lastLoadedId: result[result.length - 1]['id']
@@ -72785,7 +72787,28 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "authors-for-admin-wrapper"
-      }, Object.entries(this.state.authors).map(function (_ref) {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "author-info"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "author-name"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
+        onSubmit: this.addNewAuthor.bind(this)
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        type: "text",
+        value: this.state.newFirstName,
+        onChange: this.handleNewFirstNameEditing.bind(this),
+        title: "First name"
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        type: "text",
+        className: "input-with-margin",
+        value: this.state.newLastName,
+        onChange: this.handleNewLastNameEditing.bind(this),
+        title: "Last name"
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        type: "submit",
+        className: "ellipse-button input-with-margin",
+        value: "Add new author"
+      })))), Object.entries(this.state.authors).map(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             authorIndex = _ref2[0],
             author = _ref2[1];
@@ -72814,7 +72837,7 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
           value: "Save changes"
         }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
           className: "author-amount-of-books"
-        }, "Wrote ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("b", null, author.book_amount), " books"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        }, "Wrote ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("b", null, author.books_count), " books"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
           className: "delete-book-icon delete-icon",
           title: "Delete author",
           onClick: _this2.deleteAuthor.bind(_this2, authorIndex)
@@ -72830,6 +72853,8 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
 
     _this = _super.call(this, props);
     _this.state = {
+      newFirstName: '',
+      newLastName: '',
       authors: {}
     };
     return _this;
@@ -72848,7 +72873,7 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
                 _context.next = 2;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('authors/load-for-admin').then(function (authors) {
                   _this3.setState({
-                    authors: authors
+                    authors: authors['data']
                   });
                 });
 
@@ -72935,6 +72960,57 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
       }
 
       return saveAuthorChanges;
+    }()
+  }, {
+    key: "handleNewFirstNameEditing",
+    value: function handleNewFirstNameEditing(event) {
+      this.setState({
+        newFirstName: event.target.value
+      });
+    }
+  }, {
+    key: "handleNewLastNameEditing",
+    value: function handleNewLastNameEditing(event) {
+      this.setState({
+        newLastName: event.target.value
+      });
+    }
+  }, {
+    key: "addNewAuthor",
+    value: function () {
+      var _addNewAuthor = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(event) {
+        var data;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                event.preventDefault();
+                data = {
+                  firstName: this.state.newFirstName,
+                  lastName: this.state.newLastName
+                };
+                _context4.next = 4;
+                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('authors/create/', {
+                  data: data,
+                  token: localStorage.getItem('authToken')
+                }).then(function (response) {
+                  /*s*/
+                  console.log('response=', response); //todo r
+                })["catch"](function (err) {});
+
+              case 4:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function addNewAuthor(_x4) {
+        return _addNewAuthor.apply(this, arguments);
+      }
+
+      return addNewAuthor;
     }()
   }, {
     key: "handleFirstNameEdit",
@@ -73749,6 +73825,9 @@ var Header = /*#__PURE__*/function (_React$Component) {
                   login: login,
                   password: password
                 }).then(function (result) {
+                  /*s*/
+                  console.log('result=', result); //todo r
+
                   if (result.error) {
                     switch (result.type) {
                       case 'warning_message':
@@ -73761,7 +73840,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
                         break;
                     }
                   } else {
-                    _this2.handleLoginSuccess(result.original, result.special_access);
+                    _this2.handleLoginSuccess(result);
                   }
                 });
 
@@ -73845,7 +73924,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
                         break;
                     }
                   } else {
-                    _this3.handleLoginSuccess(result.original, result.special_access);
+                    _this3.handleLoginSuccess(result, result.special_access);
                   }
                 });
 
@@ -73867,13 +73946,17 @@ var Header = /*#__PURE__*/function (_React$Component) {
     key: "handleLoginSuccess",
     value: function handleLoginSuccess(userData) {
       var specialAccess = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var token = userData.access_token;
-      var userId = userData.user.id;
-      var login = userData.user.login;
+
+      /*s*/
+      console.log('userData=', userData); //todo r
+
+      var token = userData.data.access_token;
+      var userId = userData.data.user.id;
+      var login = userData.data.user.login;
       localStorage.setItem('authToken', token);
       localStorage.setItem('userId', userId);
       localStorage.setItem('login', login);
-      localStorage.setItem('specialAccess', specialAccess);
+      localStorage.setItem('specialAccess', userData.data.specialAccess);
       this.props.changeUser(userId, specialAccess);
       this.setState({
         isLogged: true,
@@ -74361,9 +74444,12 @@ var SingleBook = /*#__PURE__*/function (_React$Component) {
                 id = this.props.match.params.id;
                 _context2.next = 4;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/' + id).then(function (result) {
-                  if (Object.keys(result).length !== 0) {
+                  /*s*/
+                  console.log('11result=', result); //todo r
+
+                  if (Object.keys(result.data).length !== 0) {
                     _this2.setState({
-                      book: result
+                      book: result.data
                     });
                   } else {
                     _this2.setState({
@@ -74532,38 +74618,44 @@ var RequestHandler = /*#__PURE__*/function () {
                       while (1) {
                         switch (_context.prev = _context.next) {
                           case 0:
+                            /*s*/
+                            console.log('requestResponse=', requestResponse); //todo r
+
                             if (!(requestResponse.statusText !== 'OK' || requestResponse.status !== 200 || !requestResponse.hasOwnProperty('data'))) {
-                              _context.next = 4;
+                              _context.next = 5;
                               break;
                             }
 
                             throw new Error("Bad result");
 
-                          case 4:
+                          case 5:
                             responseData = requestResponse.data;
+                            /*s*/
 
-                            if (!(responseData.hasOwnProperty('response_type') && responseData.response_type === 'ok' && responseData.hasOwnProperty('data'))) {
-                              _context.next = 13;
+                            console.log('responseData=', responseData); //todo r
+
+                            if (!(responseData.hasOwnProperty('success') && responseData.success === true && responseData.hasOwnProperty('data'))) {
+                              _context.next = 15;
                               break;
                             }
 
                             if (!responseData.data) {
-                              _context.next = 10;
+                              _context.next = 12;
                               break;
                             }
 
                             return _context.abrupt("return", responseData.data);
 
-                          case 10:
+                          case 12:
                             return _context.abrupt("return", []);
 
-                          case 11:
-                            _context.next = 17;
+                          case 13:
+                            _context.next = 19;
                             break;
 
-                          case 13:
+                          case 15:
                             if (!(responseData.response_type === 'warning_message')) {
-                              _context.next = 17;
+                              _context.next = 19;
                               break;
                             }
 
@@ -74579,7 +74671,7 @@ var RequestHandler = /*#__PURE__*/function () {
 
                             return _context.abrupt("return", returnArray);
 
-                          case 17:
+                          case 19:
                           case "end":
                             return _context.stop();
                         }
@@ -74670,8 +74762,8 @@ var RequestHandler = /*#__PURE__*/function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\OpenServer\OpenServer\domains\book_crud\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\OpenServer\OpenServer\domains\book_crud\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\Edmond\PhpstormProjects\smartdata_books\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\Edmond\PhpstormProjects\smartdata_books\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

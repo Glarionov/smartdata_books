@@ -8,63 +8,69 @@ use App\Models\BookAuthor;
 use App\Models\UsersWithExtraAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use MarcinOrlowski\ResponseBuilder\ResponseBuilder as RB;
+use App\Helpers\ApiCode;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthorController extends Controller
 {
+
+    /**
+     * Main table with authors of the books
+     */
+    const AUTHOR_TABLE = 'authors';
+
     /**
      * Loads authors by his/her first or last name match
      *
      * @param Request $request
-     * @return array
+     * @return Response
      */
-    public function loadBySubstring(Request $request)
+    public function loadBySubstring(Request $request): Response
     {
         $substring = request()->post('substring');
         $excludeAuthors = request()->post('authorKeys');
 
         $Authors = new Author();
+        $queryFirstPart = $Authors->select('*');
 
+        /**
+         * If there are two words in search string - first word counts as first name and second as last name
+         * If only one - processing search in both fields
+         */
         if (stripos($substring, ' ') !== false) {
             $substringParts = explode(' ', $substring);
             $firstName = $substringParts[0];
             $lastName = $substringParts[1];
 
-            $authorsBySubstring = $Authors->select('*')
+            $queryFirstPart = $queryFirstPart
                 ->where('first_name', 'like', '%' . $firstName . '%')
-                ->where('last_name', 'like', '%' . $lastName . '%')
-                ->whereNotIn('id', $excludeAuthors)
-                ->where('deleted', '=', 0)->get()->keyBy('id');
+                ->where('last_name', 'like', '%' . $lastName . '%');
 
         } else {
-            $authorsBySubstring = $Authors->select('*')
+            $queryFirstPart = $queryFirstPart
                 ->where(function ($q) use ($substring) {
                     $q->where('first_name', 'like', '%' . $substring . '%')
                         ->orWhere('last_name', 'like', '%' . $substring . '%');
-                })
-                ->whereNotIn('id', $excludeAuthors)
-                ->where('deleted', '=', 0)->get()->keyBy('id');
+                });
         }
 
-        return ['response_type' => 'ok', 'substring' => $substring, 'data' => $authorsBySubstring];
+        $authorsBySubstring = $queryFirstPart
+            ->whereNotIn('id', $excludeAuthors)
+            ->get()->keyBy('id');
+
+        return RB::success(['data' => $authorsBySubstring]);
     }
 
+    /**
+     * Loads author with amount of their books
+     *
+     * @return Response
+     */
     public function loadForAdmin()
     {
-        $Author = new Author();
-        $allAuthors = $Author->all()->keyBy('id')->toArray();
-
-        $BookAuthor = new BookAuthor();
-
-        $amountOfBooksByAuthor = $BookAuthor->select('author_id', DB::raw('count(*) as book_amount'))
-            ->groupBy('author_id')
-            ->get()->toArray();
-
-        foreach ($allAuthors as $authorId => $author) {
-            $allAuthors[$authorId]['book_amount'] =
-                empty($amountOfBooksByAuthor[$authorId]) ? 0 : $amountOfBooksByAuthor[$authorId]['book_amount'];
-        }
-
-        return ['response_type' => 'ok', 'data' => $allAuthors];
+        $authors = Author::withCount('books')->get()->keyBy('id');
+        return RB::success(['data' => $authors]);
     }
 
     /**
@@ -72,70 +78,46 @@ class AuthorController extends Controller
      *
      * @param Request $request
      * @param int $authorId
-     * @return array
+     * @return Response
      */
-    public function deleteById(Request $request, $authorId)
+    public function deleteById(Request $request, int $authorId): Response
     {
-        $user = auth()->user();
-
-        // Only certain users have access for this operation
-        if ($user) {
-            $userId = $user->getAuthIdentifier();
-            $UsersWithExtraAccess = new UsersWithExtraAccess();
-            $isExtraUser = $UsersWithExtraAccess->select('*')->where('user_id', $userId)->count();
-
-            if (!empty($isExtraUser)) {
-                $Author = new Author();
-                $updateResult = $Author->where('id', $authorId)->update(['deleted' => 1]);
-
-                if ($updateResult) {
-                    return ['response_type' => 'ok', 'data' => ['deleted' => '1']];
-                } else {
-                    return ['response_type' => 'error'];
-                }
-            } else {
-                return ['type' => 'warning_message', 'message' => 'user do not have access to this operation'];
-            }
-
-        } else {
-            return ['type' => 'error', 'message' => 'user data loading error'];
+        $Author = new Author();
+        $deleteResult = $Author->where('id', $authorId)->delete();
+        if ($deleteResult) {
+            return RB::success();
         }
+
+        return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
     }
 
     /**
      * Changes author's info
      *
      * @param Request $request
+     * @return Response
      */
-    public function updateAuthorData(Request $request)
+    public function updateAuthorData(Request $request): Response
     {
-        $user = auth()->user();
+        $postData = $request->validate([
+            'data' => ['required'],
+            'authorId' => ['required'],
+            'data.first_name' => ['required'],
+            'data.last_name' => ['required'],
+        ]);
 
-        $data = request()->post('data');
-        $authorId = request()->post('authorId');
+        $updateResult = DB::table(self::AUTHOR_TABLE)->where('id', $postData['authorId'])->update($postData['data']);
 
-        // Only certain users have access for this operation
-        if ($user) {
-            $userId = $user->getAuthIdentifier();
-            $UsersWithExtraAccess = new UsersWithExtraAccess();
-            $isExtraUser = $UsersWithExtraAccess->select('*')->where('user_id', $userId)->count();
-
-            if (!empty($isExtraUser)) {
-                $Author = new Author();
-
-                $updateResult = $Author->where('id', $authorId)->update($data);
-
-                if ($updateResult) {
-                    return ['response_type' => 'ok', 'data' => $updateResult];
-                } else {
-                    return ['response_type' => 'author update error'];
-                }
-            } else {
-                return ['type' => 'warning_message', 'message' => 'user do not have access to this operation'];
-            }
-
-        } else {
-            return ['type' => 'error', 'message' => 'user data loading error'];
+        if ($updateResult) {
+            return RB::success();
         }
+
+        return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
+    }
+
+
+    public function create(): Response
+    {
+        return RB::success();
     }
 }

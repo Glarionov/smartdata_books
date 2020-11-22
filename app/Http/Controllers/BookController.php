@@ -5,11 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\BookAuthor;
 use App\Models\UsersWithExtraAccess;
+use http\Client\Response;
 use Illuminate\Http\Request;
 use App\Models\Author;
+use MarcinOrlowski\ResponseBuilder\ResponseBuilder as RB;
+use App\Helpers\ApiCode;
 
 class BookController extends Controller
 {
+
+    /**
+     * Table connecting by id books and it's author
+     */
+    const BOOK_AUTHOR_TABLE = 'book_authors';
 
     private int $itemsPerPage = 10;
 
@@ -25,7 +33,6 @@ class BookController extends Controller
         $Book = new Book();
 
         $books = $Book->select('id', 'name')
-            ->where('deleted', '=', 0)
             ->where('id', '>', $lastLoadedId)
             ->limit($this->itemsPerPage)->get();
 
@@ -37,49 +44,40 @@ class BookController extends Controller
 
             $bookId = $book['id'];
 
-            $loadedAuthors = $Authors->leftJoin('book_authors', function ($bookAuthorsHandler) {
+            $loadedAuthors = $Authors->leftJoin(self::BOOK_AUTHOR_TABLE, function ($bookAuthorsHandler) {
 
                 $bookAuthorsHandler->on('book_authors.author_id', '=', 'authors.id');
             })->select('authors.*')
                 ->where('book_authors.book_id', '=', $bookId)
-                ->get()->toArray();
+                ->get()->keyBy('id')->toArray();
 
             $element = $book;
             $authors = array_combine(array_column($loadedAuthors, 'id'), $loadedAuthors);
-            $element['authors'] = $authors;
+//            $element['authors'] = $authors;
+            $element['authors'] = $loadedAuthors;
 
             $result[] = $element;
         }
 
-        return ['response_type' => 'ok', 'data' => $result];
+        return RB::success(['data' => $result]);
     }
 
     /**
      *
      *
      * @param Request $request
-     * @return array
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function loadById(Request $request, $bookId)
     {
-        $Book = new Book();
 
-        $bookInfo = $Book->select('*')->where('id', '=', $bookId)->where('deleted', '=', 0)->first();
+        $book = Book::find($bookId);
+        $book['authors'] = $book->authors()->get()->keyBy('id');
 
-        if ($bookInfo) {
-            $Authors = new Author();
-
-            $loadedAuthors = $Authors->leftJoin('book_authors', function ($bookAuthorsHandler) {
-
-                $bookAuthorsHandler->on('book_authors.author_id', '=', 'authors.id');
-            })->select('authors.*')
-                ->where('book_authors.book_id', '=', $bookId)
-                ->get()->toArray();
-            $authors = array_combine(array_column($loadedAuthors, 'id'), $loadedAuthors);
-            $bookInfo['authors'] = $authors;
+        if (!$book) {
+            return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
         }
-
-        return ['response_type' => 'ok', 'data' => $bookInfo];
+        return RB::success(['data' => $book]);
     }
 
     /**
@@ -91,30 +89,30 @@ class BookController extends Controller
      */
     public function deleteById(Request $request, $bookId)
     {
-        $user = auth()->user();
-
-        // Only certain users have access for this operation
-        if ($user) {
-            $userId = $user->getAuthIdentifier();
-            $UsersWithExtraAccess = new UsersWithExtraAccess();
-            $isExtraUser = $UsersWithExtraAccess->select('*')->where('user_id', $userId)->count();
-
-            if (!empty($isExtraUser)) {
-                $Book = new Book();
-                $updateResult = $Book->where('id', $bookId)->update(['deleted' => 1]);
-
-                if ($updateResult) {
-                    return ['response_type' => 'ok', 'data' => ['deleted' => '1']];
-                } else {
-                    return ['response_type' => 'error'];
-                }
-            } else {
-                return ['type' => 'warning_message', 'message' => 'user do not have access to this operation'];
-            }
-
-        } else {
-            return ['type' => 'error', 'message' => 'user data loading error'];
-        }
+//        $user = auth()->user();
+//
+//        // Only certain users have access for this operation
+//        if ($user) {
+//            $userId = $user->getAuthIdentifier();
+//            $UsersWithExtraAccess = new UsersWithExtraAccess();
+//            $isExtraUser = $UsersWithExtraAccess->select('*')->where('user_id', $userId)->count();
+//
+//            if (!empty($isExtraUser)) {
+//                $Book = new Book();
+//                $updateResult = $Book->where('id', $bookId)->update(['deleted' => 1]);
+//
+//                if ($updateResult) {
+//                    return ['response_type' => 'ok', 'data' => ['deleted' => '1']];
+//                } else {
+//                    return ['response_type' => 'error'];
+//                }
+//            } else {
+//                return ['type' => 'warning_message', 'message' => 'user do not have access to this operation'];
+//            }
+//
+//        } else {
+//            return ['type' => 'error', 'message' => 'user data loading error'];
+//        }
     }
 
     /**

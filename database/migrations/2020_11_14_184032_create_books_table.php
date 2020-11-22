@@ -18,7 +18,7 @@ class CreateBooksTable extends Migration
             $table->string('name');
             $table->string('cover')->nullable();
             $table->date('publish_date')->nullable();
-            $table->boolean('deleted')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

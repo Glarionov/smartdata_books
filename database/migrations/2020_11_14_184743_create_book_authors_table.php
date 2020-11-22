@@ -16,7 +16,7 @@ class CreateBookAuthorsTable extends Migration
         Schema::create('book_authors', function (Blueprint $table) {
             $table->unsignedBigInteger('book_id');
             $table->unsignedBigInteger('author_id');
-            $table->boolean('deleted')->default(false); //todo r
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('book_id')->references('id')->on('books');
