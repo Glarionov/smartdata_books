@@ -8,19 +8,19 @@ class AuthorsForAdmin extends React.Component {
     render() {
         return (
             <div className="authors-for-admin-wrapper">
-                <div className="author-info">
+                <div className="author-info author-info-new adder-block-wrapper">
                     <div className="author-name">
                         <form onSubmit={this.addNewAuthor.bind(this)}>
                             <input type="text"
                                    value={this.state.newFirstName}
                                    onChange={this.handleNewFirstNameEditing.bind(this)}
-                                   title="First name"
+                                   placeholder="New authors' name"
                             />
                             <input type="text"
                                    className="input-with-margin"
                                    value={this.state.newLastName}
                                    onChange={this.handleNewLastNameEditing.bind(this)}
-                                   title="Last name"
+                                   placeholder="and last name"
                             />
                             <input type="submit"
                                    className="ellipse-button input-with-margin" value="Add new author"/>
@@ -36,13 +36,13 @@ class AuthorsForAdmin extends React.Component {
                                 <input type="text"
                                        value={author.first_name}
                                        onChange={this.handleFirstNameEdit.bind(this, authorIndex)}
-                                       title="First name"
+                                       placeholder="First name"
                                 />
                                 <input type="text"
                                        className="input-with-margin"
                                        value={author.last_name}
                                        onChange={this.handleLastNameEdit.bind(this, authorIndex)}
-                                       title="Last name"
+                                       placeholder="Last name"
                                 />
                                 <input type="submit"
                                        className="ellipse-button input-with-margin" value="Save changes"/>
@@ -53,7 +53,8 @@ class AuthorsForAdmin extends React.Component {
                             Wrote <b>{author.books_count}</b> books
                         </div>
 
-                        <div className="delete-book-icon delete-icon" title="Delete author" onClick={this.deleteAuthor.bind(this, authorIndex)}>
+                        <div className="delete-book-icon delete-icon" title="Delete author"
+                             onClick={this.deleteAuthor.bind(this, authorIndex)}>
                             ⨯
                         </div>
                     </div>
@@ -117,15 +118,32 @@ class AuthorsForAdmin extends React.Component {
     async addNewAuthor(event) {
         event.preventDefault();
 
-        let data = {
-            firstName: this.state.newFirstName,
-            lastName: this.state.newLastName,
-        }
+        let firstName = this.state.newFirstName;
+        let lastName = this.state.newLastName;
 
-        await RequestHandler.makeRequest('authors/create/'
-            , {data, token: localStorage.getItem('authToken')})
+        this.setState({
+            newFirstName: '',
+            newLastName: '',
+        });
+
+        await RequestHandler.makeRequest('authors/create/', {
+            firstName,
+            lastName,
+            token: localStorage.getItem('authToken')
+        })
             .then(response => {
                 /*s*/console.log('response=', response); //todo r
+                if (response.hasOwnProperty('id')) {
+                    let authors = this.state.authors;
+                    authors[response.id] =
+                        {
+                            first_name: firstName,
+                            last_name: lastName
+                        };
+
+                    /*s*/console.log('authors=', authors); //todo r
+                    this.setState({authors});
+                }
             }).catch(err => {
             });
     }

@@ -5,14 +5,12 @@ class Book extends React.Component {
 
     render() {
         return (
-            <div className="book-wrapper">
+            <div className="book-wrapper fading-out">
 
                 {this.state.deleted &&
                 <div className="deleted-book">
-                    This book have been deleted
-
+                    The book {this.state.name} have been deleted
                 </div>
-
                 }
 
                 {!this.state.deleted &&
@@ -188,11 +186,9 @@ class Book extends React.Component {
             let url = 'books/' + this.props.book.id + '?token=' + token;
             await RequestHandler.makeRequest(url, false, 'delete').then(
                 result => {
-                    if (result.hasOwnProperty('deleted') && result.deleted) {
-                        this.setState({
-                            deleted: 1
-                        })
-                    }
+                    this.setState({
+                        deleted: 1
+                    })
                 }
             );
         }
@@ -272,9 +268,9 @@ class Book extends React.Component {
 
                     // const result = words.filter(word => word.length > 6);
 
-                    if (result) {
+                    if (result.hasOwnProperty('data')) {
                         this.setState({
-                            newFoundAuthors: result
+                            newFoundAuthors: result.data
                         })
                     }
 

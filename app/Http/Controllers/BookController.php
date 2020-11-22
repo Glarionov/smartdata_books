@@ -26,37 +26,48 @@ class BookController extends Controller
      *
      * @param Request $request
      * @param int $lastLoadedId
-     * @return array
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function loadAll(Request $request, int $lastLoadedId)
+    public function loadFromId(Request $request, int $lastLoadedId)
     {
         $Book = new Book();
 
         $books = $Book->select('id', 'name')
             ->where('id', '>', $lastLoadedId)
-            ->limit($this->itemsPerPage)->get();
+            ->limit($this->itemsPerPage)->get()->keyBy('id');
 
-        $result = [];
-
-        foreach ($books as $book) {
-            $Authors = new Author();
+        $result = $books->toArray();
 
 
-            $bookId = $book['id'];
 
-            $loadedAuthors = $Authors->leftJoin(self::BOOK_AUTHOR_TABLE, function ($bookAuthorsHandler) {
+//        $ba = $books->authors()->get();
+//
+//        $baa = (array) $ba;
+//        /*s*/echo '$baa= <pre>' . print_r($baa, true). '</pre>'; //todo r
+//        exit;
 
-                $bookAuthorsHandler->on('book_authors.author_id', '=', 'authors.id');
-            })->select('authors.*')
-                ->where('book_authors.book_id', '=', $bookId)
-                ->get()->keyBy('id')->toArray();
+        foreach ($books as $bookId => $book) {
+            $authors = $book->authors()->get()->keyBy('id');
+            $result[$bookId]['authors'] = $authors;
 
-            $element = $book;
-            $authors = array_combine(array_column($loadedAuthors, 'id'), $loadedAuthors);
-//            $element['authors'] = $authors;
-            $element['authors'] = $loadedAuthors;
-
-            $result[] = $element;
+//            $Authors = new Author();
+//
+//
+//            $bookId = $book['id'];
+//
+//            $loadedAuthors = $Authors->leftJoin(self::BOOK_AUTHOR_TABLE, function ($bookAuthorsHandler) {
+//
+//                $bookAuthorsHandler->on('book_authors.author_id', '=', 'authors.id');
+//            })->select('authors.*')
+//                ->where('book_authors.book_id', '=', $bookId)
+//                ->get()->keyBy('id')->toArray();
+//
+//            $element = $book;
+//            $authors = array_combine(array_column($loadedAuthors, 'id'), $loadedAuthors);
+////            $element['authors'] = $authors;
+//            $element['authors'] = $loadedAuthors;
+//
+//            $result[] = $element;
         }
 
         return RB::success(['data' => $result]);
@@ -85,34 +96,17 @@ class BookController extends Controller
      *
      * @param Request $request
      * @param int $bookId
-     * @return array
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteById(Request $request, $bookId)
     {
-//        $user = auth()->user();
-//
-//        // Only certain users have access for this operation
-//        if ($user) {
-//            $userId = $user->getAuthIdentifier();
-//            $UsersWithExtraAccess = new UsersWithExtraAccess();
-//            $isExtraUser = $UsersWithExtraAccess->select('*')->where('user_id', $userId)->count();
-//
-//            if (!empty($isExtraUser)) {
-//                $Book = new Book();
-//                $updateResult = $Book->where('id', $bookId)->update(['deleted' => 1]);
-//
-//                if ($updateResult) {
-//                    return ['response_type' => 'ok', 'data' => ['deleted' => '1']];
-//                } else {
-//                    return ['response_type' => 'error'];
-//                }
-//            } else {
-//                return ['type' => 'warning_message', 'message' => 'user do not have access to this operation'];
-//            }
-//
-//        } else {
-//            return ['type' => 'error', 'message' => 'user data loading error'];
-//        }
+        $Book = new Book();
+        $deleteResult = $Book->where('id', $bookId)->delete();
+        if ($deleteResult) {
+            return RB::success();
+        }
+
+        return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -121,6 +115,15 @@ class BookController extends Controller
      * @param Request $request
      */
     public function updateBookData(Request $request) {
+
+        /*
+                 $data = $this->validate($request, [
+            "name" => 'required|string|max:255',
+            "last_name" => 'required|string|max:255',
+        ]);
+        $author->update($data);
+        $author->books()->attach(Book::find($request->books_id));
+         */
         $user = auth()->user();
 
         $editingBookName = request()->post('editingBookName');
@@ -168,22 +171,26 @@ class BookController extends Controller
     }
 
     /**
+     * Creates new Book
+     *
      * @param Request $request
-     * @return string[]
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function create(Request $request) {
-        $name = request()->post('name');
+        $postData = $request->validate([
+            'name' => ['required', 'string']
+        ]);
+
         $Book = new Book();
 
-        $Book->name = $name;
+        $Book->name = $postData['name'];
         $Book->save();
 
         if ($Book->id) {
-            return ['response_type' => 'ok', 'data' => $Book->id];
+            return RB::success(['id' => $Book->id]);
         } else {
-            return ['response_type' => 'error', 'message' => 'book creating error'];
+            return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
         }
-
     }
 
 }

@@ -20,6 +20,7 @@ class AuthorController extends Controller
      */
     const AUTHOR_TABLE = 'authors';
 
+
     /**
      * Loads authors by his/her first or last name match
      *
@@ -62,6 +63,7 @@ class AuthorController extends Controller
         return RB::success(['data' => $authorsBySubstring]);
     }
 
+
     /**
      * Loads author with amount of their books
      *
@@ -91,6 +93,7 @@ class AuthorController extends Controller
         return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
     }
 
+
     /**
      * Changes author's info
      *
@@ -116,8 +119,22 @@ class AuthorController extends Controller
     }
 
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return RB::success();
+        $postData = $request->validate([
+            'firstName' => ['required', 'string'],
+            'lastName' => ['required', 'string'],
+        ]);
+
+        $Author = new Author();
+        $Author->first_name = $postData['firstName'];
+        $Author->last_name = $postData['lastName'];
+        $Author->save();
+
+        if (empty($Author->id)) {
+            return RB::error(ApiCode::INTERNAL_SERVER_ERROR);
+        }
+
+        return RB::success(['id' => $Author->id]);
     }
 }

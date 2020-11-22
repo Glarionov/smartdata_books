@@ -72420,14 +72420,6 @@ __webpack_require__.r(__webpack_exports__);
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -72482,7 +72474,7 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "all-books-list"
       }, this.props.specialAccess && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        className: "book-adder-wrapper"
+        className: "book-adder-wrapper adder-block-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         onSubmit: this.addNewBook.bind(this)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
@@ -72496,15 +72488,13 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
         className: "new-book-adder-button ellipse-button",
         value: "Add new book"
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_infinite_scroll_component__WEBPACK_IMPORTED_MODULE_2__["default"], {
-        dataLength: this.state.books.length,
+        dataLength: Object.keys(this.state.books).length,
         next: this.loadMoreBooks.bind(this),
         hasMore: this.state.hasMore,
         loader: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h4", null, "Loading..."),
         endMessage: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("p", {
-          style: {
-            textAlign: 'center'
-          }
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("b", null, "All booklist have been loaded"))
+          className: "all-loaded-message"
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("b", null, "All books have been loaded"))
       }, Object.entries(this.state.books).map(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             bookIndex = _ref2[0],
@@ -72530,7 +72520,7 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
 
     _this = _super.call(this, props);
     _this.state = {
-      books: [],
+      books: {},
       lastLoadedId: 0,
       hasMore: true,
       newBookName: ''
@@ -72602,12 +72592,27 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
                 from = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : 0;
                 _context3.next = 3;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/list/' + from).then(function (result) {
-                  if (result.data) {
+                  if (result.hasOwnProperty('data') && Object.keys(result.data).length !== 0) {
                     result = result.data;
+                    /*s*/
+
+                    console.log('result=', result); //todo r
+
+                    var books = _this3.state.books;
+                    books = Object.assign(books, result);
+                    var keys = Object.keys(result);
+                    /*s*/
+
+                    console.log('keys=', keys); //todo r
+
+                    var lastLoadedId = result[Object.keys(result).length - 1]['id'];
+                    /*s*/
+
+                    console.log('lastLoadedId=', lastLoadedId); //todo r
 
                     _this3.setState({
-                      books: [].concat(_toConsumableArray(_this3.state.books), _toConsumableArray(result)),
-                      lastLoadedId: result[result.length - 1]['id']
+                      books: books,
+                      lastLoadedId: lastLoadedId
                     });
                   } else {
                     _this3.setState({
@@ -72679,8 +72684,8 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/create', {
                   name: newBookName
                 }).then(function (result) {
-                  if (result) {
-                    _this4.props.history.push("/book/" + result + '?editing=1');
+                  if (result.hasOwnProperty('id')) {
+                    _this4.props.history.push("/book/" + result.id + '?editing=1');
                   } else {}
                 })["catch"](function (err) {});
 
@@ -72788,7 +72793,7 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "authors-for-admin-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        className: "author-info"
+        className: "author-info author-info-new adder-block-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "author-name"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
@@ -72797,13 +72802,13 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
         type: "text",
         value: this.state.newFirstName,
         onChange: this.handleNewFirstNameEditing.bind(this),
-        title: "First name"
+        placeholder: "New authors' name"
       }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "text",
         className: "input-with-margin",
         value: this.state.newLastName,
         onChange: this.handleNewLastNameEditing.bind(this),
-        title: "Last name"
+        placeholder: "and last name"
       }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
         type: "submit",
         className: "ellipse-button input-with-margin",
@@ -72824,13 +72829,13 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
           type: "text",
           value: author.first_name,
           onChange: _this2.handleFirstNameEdit.bind(_this2, authorIndex),
-          title: "First name"
+          placeholder: "First name"
         }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
           type: "text",
           className: "input-with-margin",
           value: author.last_name,
           onChange: _this2.handleLastNameEdit.bind(_this2, authorIndex),
-          title: "Last name"
+          placeholder: "Last name"
         }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
           type: "submit",
           className: "ellipse-button input-with-margin",
@@ -72979,26 +72984,46 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
     key: "addNewAuthor",
     value: function () {
       var _addNewAuthor = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(event) {
-        var data;
+        var _this5 = this;
+
+        var firstName, lastName;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 event.preventDefault();
-                data = {
-                  firstName: this.state.newFirstName,
-                  lastName: this.state.newLastName
-                };
-                _context4.next = 4;
+                firstName = this.state.newFirstName;
+                lastName = this.state.newLastName;
+                this.setState({
+                  newFirstName: '',
+                  newLastName: ''
+                });
+                _context4.next = 6;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('authors/create/', {
-                  data: data,
+                  firstName: firstName,
+                  lastName: lastName,
                   token: localStorage.getItem('authToken')
                 }).then(function (response) {
                   /*s*/
                   console.log('response=', response); //todo r
+
+                  if (response.hasOwnProperty('id')) {
+                    var authors = _this5.state.authors;
+                    authors[response.id] = {
+                      first_name: firstName,
+                      last_name: lastName
+                    };
+                    /*s*/
+
+                    console.log('authors=', authors); //todo r
+
+                    _this5.setState({
+                      authors: authors
+                    });
+                  }
                 })["catch"](function (err) {});
 
-              case 4:
+              case 6:
               case "end":
                 return _context4.stop();
             }
@@ -73175,10 +73200,10 @@ var Book = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-        className: "book-wrapper"
+        className: "book-wrapper fading-out"
       }, this.state.deleted && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "deleted-book"
-      }, "This book have been deleted"), !this.state.deleted && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, "The book ", this.state.name, " have been deleted"), !this.state.deleted && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "not-deleted-book"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "book-cover"
@@ -73317,11 +73342,9 @@ var Book = /*#__PURE__*/function (_React$Component) {
                 url = 'books/' + this.props.book.id + '?token=' + token;
                 _context.next = 5;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest(url, false, 'delete').then(function (result) {
-                  if (result.hasOwnProperty('deleted') && result.deleted) {
-                    _this3.setState({
-                      deleted: 1
-                    });
-                  }
+                  _this3.setState({
+                    deleted: 1
+                  });
                 });
 
               case 5:
@@ -73446,9 +73469,9 @@ var Book = /*#__PURE__*/function (_React$Component) {
                 _context3.next = 9;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest(url, postData).then(function (result) {
                   // const result = words.filter(word => word.length > 6);
-                  if (result) {
+                  if (result.hasOwnProperty('data')) {
                     _this4.setState({
-                      newFoundAuthors: result
+                      newFoundAuthors: result.data
                     });
                   } // this.setState({
                   //     name: editingBookName,

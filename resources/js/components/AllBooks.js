@@ -9,7 +9,7 @@ class AllBooks extends React.Component {
     render() {
         return (<div className="all-books-list">
             {this.props.specialAccess &&
-            <div className="book-adder-wrapper">
+            <div className="book-adder-wrapper adder-block-wrapper">
 
                 <form onSubmit={this.addNewBook.bind(this)}>
                     <input type="text" className="new-book-adder-text"
@@ -22,13 +22,13 @@ class AllBooks extends React.Component {
             }
 
             <InfiniteScroll
-                dataLength={this.state.books.length}
+                dataLength={Object.keys(this.state.books).length}
                 next={this.loadMoreBooks.bind(this)}
                 hasMore={this.state.hasMore}
                 loader={<h4>Loading...</h4>}
                 endMessage={
-                    <p style={{textAlign: 'center'}}>
-                        <b>All booklist have been loaded</b>
+                    <p className="all-loaded-message">
+                        <b>All books have been loaded</b>
                     </p>
                 }
             >
@@ -46,7 +46,7 @@ class AllBooks extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            books: [],
+            books: {},
             lastLoadedId: 0,
             hasMore: true,
             newBookName: ''
@@ -66,19 +66,24 @@ class AllBooks extends React.Component {
     async loadBooks(from = 0) {
         await RequestHandler.makeRequest('books/list/' + from)
             .then(result => {
-                    if (result.data) {
+                    if (result.hasOwnProperty('data') && Object.keys(result.data).length !== 0) {
                         result = result.data;
+                        /*s*/console.log('result=', result); //todo r
+                        let books = this.state.books;
+                        books = Object.assign(books, result);
+                        let keys = Object.keys(result);
+                        /*s*/console.log('keys=', keys); //todo r
+                        let lastLoadedId = result[Object.keys(result).length - 1]['id'];
+                        /*s*/console.log('lastLoadedId=', lastLoadedId); //todo r
                         this.setState({
-                            books: [...this.state.books, ...result],
-                            lastLoadedId: result[result.length - 1]['id']
+                            books,
+                            lastLoadedId
                         });
                     } else {
                         this.setState({
                             hasMore: false
                         });
                     }
-
-
                 }
             )
             .catch(err => {
@@ -102,9 +107,9 @@ class AllBooks extends React.Component {
 
         await RequestHandler.makeRequest('books/create', {name: newBookName})
             .then(result => {
-                    if (result) {
+                    if (result.hasOwnProperty('id')) {
 
-                        this.props.history.push("/book/" + result + '?editing=1');
+                        this.props.history.push("/book/" + result.id + '?editing=1');
                     } else {
 
                     }

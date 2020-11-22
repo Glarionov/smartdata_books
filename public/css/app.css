@@ -11239,3 +11239,16 @@ input[type=text]:focus {
   margin-left: 1rem;
 }
 
+.adder-block-wrapper {
+  background: #4a4a7d;
+  margin-bottom: 50px;
+}
+
+.all-loaded-message {
+  text-align: center;
+  font-size: 20px;
+  margin-top: 20px;
+  color: yellow;
+  background: radial-gradient(#184894, transparent);
+}
+
