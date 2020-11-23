@@ -10,6 +10,10 @@ class Book extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        "name",
+    ];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */

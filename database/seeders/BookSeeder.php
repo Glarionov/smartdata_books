@@ -16,7 +16,6 @@ class BookSeeder extends Seeder
     public function run()
     {
 
-
         for ($i = 0; $i < 20; $i++) {
             $Book = new Book();
             $year = 1000 + rand(100, 800) + $i;
@@ -25,21 +24,6 @@ class BookSeeder extends Seeder
             $Book->publish_date = "$year-01-01"; //todo use faker
 
             $Book->save();
-
-            $bookId = $Book->id;
-//            $bookId = $Book->insert([
-//                'name' => $this->generateName(),
-//                'publish_date' => "$year-01-01"
-//            ]);
-
-            $authorsAmount = rand(1, 3);
-
-            for ($j = 0; $j < $authorsAmount; $j++) {
-                DB::table('book_authors')->insertOrIgnore([
-                    'book_id' => $bookId,
-                    'author_id' => rand(1, 9)
-                ]);
-            }
         }
     }
 

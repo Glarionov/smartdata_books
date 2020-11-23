@@ -9,7 +9,7 @@ Route::group([
     'middleware' => ['api', 'requireSpecialAccess'],
     'prefix' => '/v1/books/'
 
-], function($router) {
+], function() {
     Route::post('/update', [BookController::class, 'updateBookData']);
     Route::post('/create', [BookController::class, 'create']);
     Route::get('/{id}', [BookController::class, 'loadById']);
@@ -18,25 +18,27 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => 'api',
+    'middleware' => ['api', 'requireSpecialAccess'],
     'prefix' => '/v1/authors/'
 
-], function($router) {
-    Route::post('/create', [AuthorController::class, 'create'])->middleware('requireSpecialAccess');
-    Route::post('/update', [AuthorController::class, 'updateAuthorData'])->middleware('requireSpecialAccess');
+], function() {
+    Route::post('/create', [AuthorController::class, 'create']);
+    Route::post('/update', [AuthorController::class, 'updateAuthorData']);
     Route::post('/load-by-substring', [AuthorController::class, 'loadBySubstring']);
     Route::get('/load-for-admin', [AuthorController::class, 'loadForAdmin']);
-    Route::delete('delete/{id}', [AuthorController::class, 'deleteById'])->middleware('requireSpecialAccess');
+    Route::delete('delete/{id}', [AuthorController::class, 'deleteById']);
 });
+
+Route::get('v1/for-user/authors/load', [AuthorController::class, 'loadForUser']);
 
 Route::group([
     'middleware' => 'api',
     'prefix' => '/v1/auth/'
 
-], function ($router) {
+], function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('register', [AuthController::class, 'register']);
     Route::post('refresh', [AuthController::class, 'refresh']);
-    Route::post('user-profile', [AuthController::class, 'userProfile'])->middleware('requireSpecialAccess');
+    Route::post('user-profile', [AuthController::class, 'userProfile']);
 });

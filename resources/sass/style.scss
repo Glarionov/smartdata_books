@@ -1,0 +1,377 @@
+html, body, .main-body, #main-wrapper, .not-found-page {
+    width: 100%;
+    height: 100%;
+}
+
+a {
+    color: #fdd58e;
+
+    &:hover {
+        color: #efb54a;
+    }
+}
+
+.main-content {
+    height: calc(100% - 120px);
+}
+
+$bookWrapperColor: #184894;
+$bodyBackgroundColor: rgb(25, 101, 180);
+
+body {
+    background: linear-gradient(90deg,$bodyBackgroundColor, #79a2cc, $bodyBackgroundColor);
+    color: #ffe4d4;
+}
+
+.big-title {
+    text-align: center;
+    color: orange;
+    font-size: 40px;
+    background: #4a4a7d;
+    padding: 10px;
+    font-weight: 900;
+}
+
+textarea, input[type="text"] {
+    background: #e1e9f1;
+
+    &:focus {
+        outline-width: 0;
+        border: 3px solid #d2acfd;
+    }
+}
+
+.not-found-page {
+    background: $bodyBackgroundColor;
+}
+
+.main-body {
+    width: 95%;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.header-wrapper {
+    width: 100%;
+    height: 120px;
+    background: #253aa5;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: 23px;
+
+    .main-header-links {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    @media (min-width: 1100px) {
+        .main-header-links {
+            margin-left: calc((100% - 1100px)/2);
+            width: 550px;
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .main-header-links {
+            margin-left: 3%;
+            width: 70%;
+        }
+    }
+
+    .auth-messages {
+        font-size: 15px;
+        margin-bottom: 1px;
+        color: #ff9595;
+    }
+
+    .header-username {
+        font-size: 33px;
+    }
+
+    .login-buttons {
+        margin-top: 0.5rem;
+    }
+
+    .header-cancel-button {
+        margin-left: 2rem;
+    }
+
+    input[type="password"] {
+        margin-left: 1rem;
+    }
+}
+
+.not-found-page {
+    color: white;
+    padding: 15%;
+    font-size: 20px;
+}
+
+.not-found-big-text {
+    font-size: 50px;
+}
+
+.custom-button {
+    background: #5757e4;
+    color: #e7e7ca;
+    padding: 2px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    margin: 2px;
+    font-size: 20px;
+    &:hover {
+        background: blue;
+    }
+}
+
+.book-adder-wrapper {
+    form {
+        width: 100%;
+    }
+}
+
+.book-adder-wrapper, .book-wrapper {
+    display: flex;
+}
+
+.book-adder-wrapper, .book-wrapper {
+    background: $bookWrapperColor;
+    padding: 20px;
+    width: 100%;
+
+    position: relative;
+    margin-top: 30px;
+}
+
+.author-info {
+    background: $bookWrapperColor;
+    width: 100%;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+.new-book-adder-text {
+    width: 70%;
+    height: 33px;
+    font-size: 21px;
+    margin-right: 5%;
+}
+
+.ellipse-button {
+    background: #ffffff59;
+    cursor: pointer;
+    height: 2rem;
+    border-radius: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0px;
+    color: white;
+    font-size: 14px;
+    width: 10rem;
+
+    &:hover {
+        border: 4px solid #6afffca1;
+    }
+
+    &:focus {
+        outline-width: 0;
+        border: 4px solid #b96aff;
+    }
+}
+
+.delete-icon {
+    background: #ffffff59;
+    cursor: pointer;
+    height: 2rem;
+    width: 2rem;
+
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+
+    &:hover {
+        border: 4px solid #6afffca1;
+    }
+}
+
+.book-wrapper {
+    .book-cover {
+        text-align: center;
+        font-size: 100px;
+        background: #483773;
+    }
+
+    .book-text-content {
+        margin-left: 20px;
+        width: 70%;
+    }
+
+    .book-name {
+        font-size: 30px;
+    }
+
+    &:before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 0;
+    }
+
+    .right-editor-element {
+        width: 10rem;
+    }
+
+    .cancel-editing-icon {
+        margin-top: 1rem;
+    }
+
+    .new-author-adder-wrapper {
+        margin-top: 2rem;
+        max-width: 100%;
+
+        .new-author-adder {
+            border-radius: .5rem;
+        }
+    }
+
+    .new-authors-list {
+        margin-top: 1rem;
+        background: #9d9dff1c;
+        text-align: center;
+        padding: 2px;
+    }
+
+    .save-editing-icon, .cancel-editing-icon, .delete-book-icon, .edit-book-icon, .author-book-change-icon {
+        background: #ffffff59;
+        cursor: pointer;
+    }
+
+    .save-editing-icon, .cancel-editing-icon, .delete-book-icon, .edit-book-icon, {
+        &:hover {
+            border: 4px solid #6afffca1;
+        }
+    }
+
+    .cancel-editing-icon, .delete-book-icon, .edit-book-icon, .save-editing-icon {
+        height: 2rem;
+        border-radius: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        right: 1rem;
+    }
+
+    .delete-book-icon, .edit-book-icon {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        width: 2rem;
+        font-size: 19px;
+        font-weight: 900;
+    }
+
+    .edit-book-icon {
+        top: 4rem;
+        font-size: 15px;
+    }
+
+    .book-name-editor {
+        width: 95%;
+    }
+
+    .author-book-change-icon {
+        margin-left: 3px;
+        height: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        padding: 1px;
+    }
+}
+
+.not-deleted-book {
+    display: flex;
+    width: 100%;
+}
+
+.single-book-wrapper {
+    .book-cover {
+        width: 40%;
+        max-width: 300px;
+        height: 400px;
+        line-height: 400px;
+    }
+
+    .book-text-content {
+        width: 50%;
+    }
+}
+
+.all-books-list {
+    .book-cover {
+        width: 20%;
+        max-width: 150px;
+        height: 200px;
+        line-height: 200px;
+    }
+}
+
+.auth-part {
+    margin-right: 30px;
+}
+
+.login-password-forms, .login-buttons {
+    display: flex;
+}
+
+.login-password-forms {
+    display: flex;
+    input {
+        height: 30px;
+        width: 40%;
+    }
+}
+
+.no-book-message {
+    font-size: 30px;
+    background: blue;
+}
+
+.author-info form input.input-with-margin {
+    margin-left: 1rem;
+}
+
+.adder-block-wrapper {
+    background: #4a4a7d;
+    margin-bottom: 50px;
+}
+
+.all-loaded-message {
+    text-align: center;
+    font-size: 20px;
+    margin-top: 20px;
+    color: yellow;
+    background: radial-gradient(#184894, transparent);
+}
+
+.author-name-for-users {
+    font-size: 25px;
+}
+
+.mini-book-info {
+    margin: 15px;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.author-name-for-users, .mini-book-info {
+    text-align: center;
+}

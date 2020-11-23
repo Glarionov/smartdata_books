@@ -72420,6 +72420,14 @@ __webpack_require__.r(__webpack_exports__);
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -72473,7 +72481,9 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
 
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "all-books-list"
-      }, this.props.specialAccess && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "big-title"
+      }, "List of All Books"), this.props.specialAccess && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "book-adder-wrapper adder-block-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
         onSubmit: this.addNewBook.bind(this)
@@ -72536,10 +72546,14 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
+                if (!localStorage.getItem('authToken')) {
+                  this.props.history.push("/authors/");
+                }
+
+                _context.next = 3;
                 return this.loadBooks(0);
 
-              case 2:
+              case 3:
               case "end":
                 return _context.stop();
             }
@@ -72594,21 +72608,10 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/list/' + from + '?token=' + localStorage.getItem('authToken')).then(function (result) {
                   if (result.hasOwnProperty('data') && Object.keys(result.data).length !== 0) {
                     result = result.data;
-                    /*s*/
-
-                    console.log('result=', result); //todo r
-
                     var books = _this3.state.books;
                     books = Object.assign(books, result);
                     var keys = Object.keys(result);
-                    /*s*/
-
-                    console.log('keys=', keys); //todo r
-
-                    var lastLoadedId = result[Object.keys(result).length - 1]['id'];
-                    /*s*/
-
-                    console.log('lastLoadedId=', lastLoadedId); //todo r
+                    var lastLoadedId = Math.max.apply(Math, _toConsumableArray(keys));
 
                     _this3.setState({
                       books: books,
@@ -72678,9 +72681,8 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 event.preventDefault();
-                console.log('Add new book');
                 newBookName = this.state.newBookName;
-                _context5.next = 5;
+                _context5.next = 4;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/create', {
                   name: newBookName
                 }).then(function (result) {
@@ -72689,7 +72691,7 @@ var AllBooks = /*#__PURE__*/function (_React$Component) {
                   } else {}
                 })["catch"](function (err) {});
 
-              case 5:
+              case 4:
               case "end":
                 return _context5.stop();
             }
@@ -72793,6 +72795,8 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "authors-for-admin-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "big-title"
+      }, "Authors Editing Page"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "author-info author-info-new adder-block-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "author-name"
@@ -72876,7 +72880,7 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('authors/load-for-admin').then(function (authors) {
+                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('authors/load-for-admin?token=' + localStorage.getItem('authToken')).then(function (authors) {
                   _this3.setState({
                     authors: authors['data']
                   });
@@ -73004,18 +73008,12 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
                   lastName: lastName,
                   token: localStorage.getItem('authToken')
                 }).then(function (response) {
-                  /*s*/
-                  console.log('response=', response); //todo r
-
                   if (response.hasOwnProperty('id')) {
                     var authors = _this5.state.authors;
                     authors[response.id] = {
                       first_name: firstName,
                       last_name: lastName
                     };
-                    /*s*/
-
-                    console.log('authors=', authors); //todo r
 
                     _this5.setState({
                       authors: authors
@@ -73073,9 +73071,31 @@ var AuthorsForAdmin = /*#__PURE__*/function (_React$Component) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers/RequestHandler */ "./resources/js/components/helpers/RequestHandler.js");
+/* harmony import */ var _Book__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Book */ "./resources/js/components/Book.js");
+
+
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -73099,28 +73119,117 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 
 
+
+
 var AuthorsForUsers = /*#__PURE__*/function (_React$Component) {
   _inherits(AuthorsForUsers, _React$Component);
 
   var _super = _createSuper(AuthorsForUsers);
 
-  function AuthorsForUsers(props) {
-    _classCallCheck(this, AuthorsForUsers);
-
-    return _super.call(this, props);
-  }
-
   _createClass(AuthorsForUsers, [{
     key: "render",
     value: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "not-found-page"
-      }, "AuthorsForUserss");
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "author-for-users"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        className: "big-title"
+      }, "List of All Authors"), Object.entries(this.state.authors).map(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            index = _ref2[0],
+            author = _ref2[1];
+
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+          className: "author-info",
+          key: index
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+          className: "author-name-for-users"
+        }, author.first_name, " ", author.last_name), Object.entries(author.books).map(function (_ref3) {
+          var _ref4 = _slicedToArray(_ref3, 2),
+              bookIndex = _ref4[0],
+              book = _ref4[1];
+
+          return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+            className: "mini-book-info"
+          }, book.name);
+        }));
+      }));
     }
   }]);
 
+  function AuthorsForUsers(props) {
+    var _this;
+
+    _classCallCheck(this, AuthorsForUsers);
+
+    _this = _super.call(this, props);
+    _this.state = {
+      authors: {}
+    };
+    return _this;
+  }
+
+  _createClass(AuthorsForUsers, [{
+    key: "componentDidMount",
+    value: function () {
+      var _componentDidMount = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.loadAuthors();
+
+              case 2:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function componentDidMount() {
+        return _componentDidMount.apply(this, arguments);
+      }
+
+      return componentDidMount;
+    }()
+  }, {
+    key: "loadAuthors",
+    value: function () {
+      var _loadAuthors = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+        var _this2 = this;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('for-user/authors/load').then(function (result) {
+                  if (result.hasOwnProperty('data')) {
+                    _this2.setState({
+                      authors: result.data
+                    });
+                  }
+                });
+
+              case 2:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }));
+
+      function loadAuthors() {
+        return _loadAuthors.apply(this, arguments);
+      }
+
+      return loadAuthors;
+    }()
+  }]);
+
   return AuthorsForUsers;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+}(react__WEBPACK_IMPORTED_MODULE_1___default.a.Component);
 
 /* harmony default export */ __webpack_exports__["default"] = (AuthorsForUsers);
 
@@ -73207,7 +73316,7 @@ var Book = /*#__PURE__*/function (_React$Component) {
         className: "not-deleted-book"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "book-cover"
-      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, "?"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "book-text-content"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "book-name"
@@ -73298,8 +73407,6 @@ var Book = /*#__PURE__*/function (_React$Component) {
   _createClass(Book, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      console.log('this.props.book.authors', this.props.book.authors); //todo r
-
       this.setState({
         name: this.props.book.name,
         editingBookName: this.props.book.name,
@@ -73458,7 +73565,8 @@ var Book = /*#__PURE__*/function (_React$Component) {
                 url = 'authors/load-by-substring';
                 postData = {
                   substring: authorSearch,
-                  authorKeys: []
+                  authorKeys: [],
+                  token: localStorage.getItem('authToken')
                 };
                 authorKeys = [];
 
@@ -73468,16 +73576,11 @@ var Book = /*#__PURE__*/function (_React$Component) {
 
                 _context3.next = 9;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest(url, postData).then(function (result) {
-                  // const result = words.filter(word => word.length > 6);
                   if (result.hasOwnProperty('data')) {
                     _this4.setState({
                       newFoundAuthors: result.data
                     });
-                  } // this.setState({
-                  //     name: editingBookName,
-                  //     authorsOnServer: this.state.authorsToShow
-                  // })
-
+                  }
                 });
 
               case 9:
@@ -73650,16 +73753,16 @@ var Header = /*#__PURE__*/function (_React$Component) {
   _createClass(Header, [{
     key: "render",
     value: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("header", {
         className: "header-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "main-header-links"
-      }, this.props.specialAccess && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, this.state.specialAccess && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "all-books-link"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
         href: "/all_books/",
         onClick: this.changePage.bind(this, '/all_books/')
-      }, "All Books")), this.props.specialAccess && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, "All Books")), this.state.specialAccess && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "all-authors-link"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("a", {
         href: "/authors_control/",
@@ -73684,6 +73787,8 @@ var Header = /*#__PURE__*/function (_React$Component) {
         className: "auth-messages"
       }, this.state.authMessage), this.state.signingIn && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "sign-in-forms"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
+        onSubmit: this.login.bind(this)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "login-password-forms"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
@@ -73698,14 +73803,17 @@ var Header = /*#__PURE__*/function (_React$Component) {
         onChange: this.handleChangeSignInPassword.bind(this)
       })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "login-buttons"
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        type: "submit",
         className: "custom-button",
-        onClick: this.login.bind(this)
-      }, "Log in"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        value: "Log in"
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "sign-in-plink header-cancel-button custom-button",
         onClick: this.openSignIn.bind(this, false)
-      }, "Cancel"))), this.state.signingUp && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, "Cancel")))), this.state.signingUp && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "sign-up-forms"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
+        onSubmit: this.register.bind(this)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "login-password-forms"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
@@ -73725,13 +73833,14 @@ var Header = /*#__PURE__*/function (_React$Component) {
         onChange: this.handleChangeSignUpPasswordConfirm.bind(this)
       })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "login-buttons"
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+        type: "submit",
         className: "custom-button",
-        onClick: this.register.bind(this)
-      }, "Register"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+        value: "Register"
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "sign-in-plink header-cancel-button custom-button",
         onClick: this.openSignUp.bind(this, false)
-      }, "Cancel"))), !this.state.signingIn && !this.state.signingUp && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, "Cancel")))), !this.state.signingIn && !this.state.signingUp && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
         className: "sign-in-plink custom-button",
         onClick: this.openSignIn.bind(this)
       }, "Sign in"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
@@ -73757,7 +73866,8 @@ var Header = /*#__PURE__*/function (_React$Component) {
       signUpLogin: '',
       signUpPassword: '',
       signUpPasswordConfirm: '',
-      authMessage: ''
+      authMessage: '',
+      specialAccess: false
     };
 
     if (localStorage.getItem('login')) {
@@ -73769,6 +73879,13 @@ var Header = /*#__PURE__*/function (_React$Component) {
   }
 
   _createClass(Header, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.setState({
+        specialAccess: this.props.specialAccess
+      });
+    }
+  }, {
     key: "changePage",
     value: function changePage(linkPart, event) {
       event.preventDefault();
@@ -73830,7 +73947,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "login",
     value: function () {
-      var _login = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+      var _login = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(event) {
         var _this2 = this;
 
         var login, password;
@@ -73838,19 +73955,17 @@ var Header = /*#__PURE__*/function (_React$Component) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                event.preventDefault();
                 login = this.state.signInLogin;
                 password = this.state.signInPassword;
                 this.setState({
                   authMessage: 'Trying to log in...'
                 });
-                _context.next = 5;
+                _context.next = 6;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('auth/login', {
                   login: login,
                   password: password
                 }).then(function (result) {
-                  /*s*/
-                  console.log('result=', result); //todo r
-
                   if (result.error) {
                     switch (result.type) {
                       case 'warning_message':
@@ -73867,7 +73982,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
                   }
                 });
 
-              case 5:
+              case 6:
               case "end":
                 return _context.stop();
             }
@@ -73875,7 +73990,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
         }, _callee, this);
       }));
 
-      function login() {
+      function login(_x) {
         return _login.apply(this, arguments);
       }
 
@@ -73884,7 +73999,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(event) {
         var _this3 = this;
 
         var login, password, passwordConfirm;
@@ -73892,12 +74007,13 @@ var Header = /*#__PURE__*/function (_React$Component) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                event.preventDefault();
                 login = this.state.signUpLogin;
                 password = this.state.signUpPassword;
                 passwordConfirm = this.state.signUpPasswordConfirm;
 
                 if (!(password !== passwordConfirm)) {
-                  _context2.next = 6;
+                  _context2.next = 7;
                   break;
                 }
 
@@ -73906,9 +74022,9 @@ var Header = /*#__PURE__*/function (_React$Component) {
                 });
                 return _context2.abrupt("return", false);
 
-              case 6:
+              case 7:
                 if (!(password.length < 5)) {
-                  _context2.next = 9;
+                  _context2.next = 10;
                   break;
                 }
 
@@ -73917,11 +74033,11 @@ var Header = /*#__PURE__*/function (_React$Component) {
                 });
                 return _context2.abrupt("return", false);
 
-              case 9:
+              case 10:
                 this.setState({
                   authMessage: 'Trying to create account...'
                 });
-                _context2.next = 12;
+                _context2.next = 13;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('auth/register', {
                   login: login,
                   password: password,
@@ -73951,7 +74067,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
                   }
                 });
 
-              case 12:
+              case 13:
               case "end":
                 return _context2.stop();
             }
@@ -73959,7 +74075,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
         }, _callee2, this);
       }));
 
-      function register() {
+      function register(_x2) {
         return _register.apply(this, arguments);
       }
 
@@ -73969,10 +74085,6 @@ var Header = /*#__PURE__*/function (_React$Component) {
     key: "handleLoginSuccess",
     value: function handleLoginSuccess(userData) {
       var specialAccess = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-      /*s*/
-      console.log('userData=', userData); //todo r
-
       var token = userData.data.access_token;
       var userId = userData.data.user.id;
       var login = userData.data.user.login;
@@ -73980,6 +74092,13 @@ var Header = /*#__PURE__*/function (_React$Component) {
       localStorage.setItem('userId', userId);
       localStorage.setItem('login', login);
       localStorage.setItem('specialAccess', userData.data.specialAccess);
+
+      if (userData.data.specialAccess) {
+        this.setState({
+          specialAccess: true
+        });
+      }
+
       this.props.changeUser(userId, specialAccess);
       this.setState({
         isLogged: true,
@@ -73999,25 +74118,26 @@ var Header = /*#__PURE__*/function (_React$Component) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 token = localStorage.getItem('authToken');
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('login');
-                localStorage.removeItem('specialAccess');
                 this.props.changeUser(0, false);
                 this.setState({
                   isLogged: false,
                   login: ''
                 });
-                _context3.next = 9;
+                _context3.next = 5;
                 return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_2__["default"].makeRequest('auth/logout', {
                   token: token
-                }).then(function (result) {})["catch"](function (err) {
+                }).then(function (result) {
+                  localStorage.removeItem('authToken');
+                  localStorage.removeItem('userId');
+                  localStorage.removeItem('login');
+                  localStorage.removeItem('specialAccess');
+                })["catch"](function (err) {
                   _this4.setState({
                     authMessage: 'Could not erase logout token'
                   });
                 });
 
-              case 9:
+              case 5:
               case "end":
                 return _context3.stop();
             }
@@ -74039,13 +74159,29 @@ var Header = /*#__PURE__*/function (_React$Component) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                if (prevProps.userId !== this.props.userId) {
-                  if (!this.props.userId) {
-                    this.logOut();
+                if (!(prevProps.userId !== this.props.userId)) {
+                  _context4.next = 4;
+                  break;
+                }
+
+                if (!(!this.props.userId && this.state.isLogged)) {
+                  _context4.next = 4;
+                  break;
+                }
+
+                _context4.next = 4;
+                return this.logOut();
+
+              case 4:
+                if (prevProps.specialAccess !== this.props.specialAccess) {
+                  if (this.props.specialAccess) {
+                    this.setState({
+                      specialAccess: true
+                    });
                   }
                 }
 
-              case 1:
+              case 5:
               case "end":
                 return _context4.stop();
             }
@@ -74053,7 +74189,7 @@ var Header = /*#__PURE__*/function (_React$Component) {
         }, _callee4, this);
       }));
 
-      function componentDidUpdate(_x) {
+      function componentDidUpdate(_x3) {
         return _componentDidUpdate.apply(this, arguments);
       }
 
@@ -74466,11 +74602,8 @@ var SingleBook = /*#__PURE__*/function (_React$Component) {
                 from = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : 0;
                 id = this.props.match.params.id;
                 _context2.next = 4;
-                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/' + id).then(function (result) {
-                  /*s*/
-                  console.log('11result=', result); //todo r
-
-                  if (Object.keys(result.data).length !== 0) {
+                return _helpers_RequestHandler__WEBPACK_IMPORTED_MODULE_3__["default"].makeRequest('books/' + id + '?token=' + localStorage.getItem('authToken')).then(function (result) {
+                  if (Object.keys(result.data).lengsth !== 0) {
                     _this2.setState({
                       book: result.data
                     });
@@ -74641,44 +74774,38 @@ var RequestHandler = /*#__PURE__*/function () {
                       while (1) {
                         switch (_context.prev = _context.next) {
                           case 0:
-                            /*s*/
-                            console.log('requestResponse=', requestResponse); //todo r
-
                             if (!(requestResponse.statusText !== 'OK' || requestResponse.status !== 200 || !requestResponse.hasOwnProperty('data'))) {
-                              _context.next = 5;
+                              _context.next = 4;
                               break;
                             }
 
                             throw new Error("Bad result");
 
-                          case 5:
+                          case 4:
                             responseData = requestResponse.data;
-                            /*s*/
-
-                            console.log('responseData=', responseData); //todo r
 
                             if (!(responseData.hasOwnProperty('success') && responseData.success === true && responseData.hasOwnProperty('data'))) {
-                              _context.next = 15;
+                              _context.next = 13;
                               break;
                             }
 
                             if (!responseData.data) {
-                              _context.next = 12;
+                              _context.next = 10;
                               break;
                             }
 
                             return _context.abrupt("return", responseData.data);
 
-                          case 12:
+                          case 10:
                             return _context.abrupt("return", []);
 
-                          case 13:
-                            _context.next = 19;
+                          case 11:
+                            _context.next = 17;
                             break;
 
-                          case 15:
+                          case 13:
                             if (!(responseData.response_type === 'warning_message')) {
-                              _context.next = 19;
+                              _context.next = 17;
                               break;
                             }
 
@@ -74694,7 +74821,7 @@ var RequestHandler = /*#__PURE__*/function () {
 
                             return _context.abrupt("return", returnArray);
 
-                          case 19:
+                          case 17:
                           case "end":
                             return _context.stop();
                         }
@@ -74785,8 +74912,8 @@ var RequestHandler = /*#__PURE__*/function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\Edmond\PhpstormProjects\smartdata_books\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\Users\Edmond\PhpstormProjects\smartdata_books\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\OpenServer\OpenServer\domains\book_crud\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\OpenServer\OpenServer\domains\book_crud\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

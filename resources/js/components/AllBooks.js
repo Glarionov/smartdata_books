@@ -8,6 +8,9 @@ class AllBooks extends React.Component {
 
     render() {
         return (<div className="all-books-list">
+            <div className="big-title">
+                List of All Books
+            </div>
             {this.props.specialAccess &&
             <div className="book-adder-wrapper adder-block-wrapper">
 
@@ -54,6 +57,11 @@ class AllBooks extends React.Component {
     }
 
     async componentDidMount() {
+
+        if (!localStorage.getItem('authToken')) {
+            this.props.history.push("/authors/");
+        }
+
         await this.loadBooks(0);
     }
 
@@ -69,13 +77,10 @@ class AllBooks extends React.Component {
             .then(result => {
                     if (result.hasOwnProperty('data') && Object.keys(result.data).length !== 0) {
                         result = result.data;
-                        /*s*/console.log('result=', result); //todo r
                         let books = this.state.books;
                         books = Object.assign(books, result);
                         let keys = Object.keys(result);
-                        /*s*/console.log('keys=', keys); //todo r
-                        let lastLoadedId = result[Object.keys(result).length - 1]['id'];
-                        /*s*/console.log('lastLoadedId=', lastLoadedId); //todo r
+                        let lastLoadedId = Math.max(...keys);
                         this.setState({
                             books,
                             lastLoadedId
@@ -102,7 +107,6 @@ class AllBooks extends React.Component {
 
     async addNewBook(event) {
         event.preventDefault();
-        console.log('Add new book')
 
         let newBookName = this.state.newBookName;
 

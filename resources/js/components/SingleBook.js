@@ -38,10 +38,9 @@ class SingleBook extends React.Component {
 
         const id = this.props.match.params.id;
 
-        await RequestHandler.makeRequest('books/' + id)
+        await RequestHandler.makeRequest('books/' + id+ '?token=' + localStorage.getItem('authToken'))
             .then(result => {
-                /*s*/console.log('11result=', result); //todo r
-                    if (Object.keys(result.data).length !== 0) {
+                    if (Object.keys(result.data).lengsth !== 0) {
 
                         this.setState({
                             book: result.data

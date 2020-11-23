@@ -10925,8 +10925,17 @@ a:hover {
 }
 
 body {
-  background: linear-gradient(90deg, #1965b4, #93bfec, #1965b4);
+  background: linear-gradient(90deg, #1965b4, #79a2cc, #1965b4);
   color: #ffe4d4;
+}
+
+.big-title {
+  text-align: center;
+  color: orange;
+  font-size: 40px;
+  background: #4a4a7d;
+  padding: 10px;
+  font-weight: 900;
 }
 
 textarea,
@@ -10955,6 +10964,8 @@ input[type=text]:focus {
   height: 120px;
   background: #253aa5;
   display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   font-size: 23px;
 }
@@ -10967,7 +10978,7 @@ input[type=text]:focus {
 @media (min-width: 1100px) {
   .header-wrapper .main-header-links {
     margin-left: calc((100% - 1100px)/2);
-    width: 50%;
+    width: 550px;
   }
 }
 
@@ -11034,13 +11045,19 @@ input[type=text]:focus {
 }
 
 .book-adder-wrapper,
-.book-wrapper,
-.author-info {
+.book-wrapper {
   background: #184894;
   padding: 20px;
   width: 100%;
   position: relative;
   margin-top: 30px;
+}
+
+.author-info {
+  background: #184894;
+  width: 100%;
+  padding: 5px;
+  margin-top: 10px;
 }
 
 .new-book-adder-text {
@@ -11092,6 +11109,8 @@ input[type=text]:focus {
 }
 
 .book-wrapper .book-cover {
+  text-align: center;
+  font-size: 100px;
   background: #483773;
 }
 
@@ -11122,6 +11141,7 @@ input[type=text]:focus {
 
 .book-wrapper .new-author-adder-wrapper {
   margin-top: 2rem;
+  max-width: 100%;
 }
 
 .book-wrapper .new-author-adder-wrapper .new-author-adder {
@@ -11199,6 +11219,7 @@ input[type=text]:focus {
   width: 40%;
   max-width: 300px;
   height: 400px;
+  line-height: 400px;
 }
 
 .single-book-wrapper .book-text-content {
@@ -11209,11 +11230,11 @@ input[type=text]:focus {
   width: 20%;
   max-width: 150px;
   height: 200px;
+  line-height: 200px;
 }
 
 .auth-part {
-  right: 30px;
-  position: absolute;
+  margin-right: 30px;
 }
 
 .login-password-forms,
@@ -11250,5 +11271,20 @@ input[type=text]:focus {
   margin-top: 20px;
   color: yellow;
   background: radial-gradient(#184894, transparent);
+}
+
+.author-name-for-users {
+  font-size: 25px;
+}
+
+.mini-book-info {
+  margin: 15px;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.author-name-for-users,
+.mini-book-info {
+  text-align: center;
 }
 

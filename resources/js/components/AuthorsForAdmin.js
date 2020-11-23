@@ -8,6 +8,9 @@ class AuthorsForAdmin extends React.Component {
     render() {
         return (
             <div className="authors-for-admin-wrapper">
+                <div className="big-title">
+                    Authors Editing Page
+                </div>
                 <div className="author-info author-info-new adder-block-wrapper">
                     <div className="author-name">
                         <form onSubmit={this.addNewAuthor.bind(this)}>
@@ -73,7 +76,7 @@ class AuthorsForAdmin extends React.Component {
     }
 
     async componentDidMount() {
-        await RequestHandler.makeRequest('authors/load-for-admin')
+        await RequestHandler.makeRequest('authors/load-for-admin?token=' + localStorage.getItem('authToken'))
             .then(authors => {
                 this.setState({authors: authors['data']});
             })
@@ -132,7 +135,6 @@ class AuthorsForAdmin extends React.Component {
             token: localStorage.getItem('authToken')
         })
             .then(response => {
-                /*s*/console.log('response=', response); //todo r
                 if (response.hasOwnProperty('id')) {
                     let authors = this.state.authors;
                     authors[response.id] =
@@ -140,8 +142,6 @@ class AuthorsForAdmin extends React.Component {
                             first_name: firstName,
                             last_name: lastName
                         };
-
-                    /*s*/console.log('authors=', authors); //todo r
                     this.setState({authors});
                 }
             }).catch(err => {

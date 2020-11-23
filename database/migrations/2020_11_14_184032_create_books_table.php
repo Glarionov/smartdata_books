@@ -16,8 +16,6 @@ class CreateBooksTable extends Migration
         Schema::create('books', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('cover')->nullable();
-            $table->date('publish_date')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

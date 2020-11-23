@@ -16,6 +16,7 @@ class Book extends React.Component {
                 {!this.state.deleted &&
                 <div className="not-deleted-book">
                     <div className="book-cover">
+                        ?
                     </div>
 
                     <div className="book-text-content">
@@ -156,8 +157,6 @@ class Book extends React.Component {
     }
 
     componentDidMount() {
-        console.log('this.props.book.authors', this.props.book.authors); //todo r
-
         this.setState({
             name: this.props.book.name,
             editingBookName: this.props.book.name,
@@ -254,7 +253,8 @@ class Book extends React.Component {
 
             let postData = {
                 substring: authorSearch,
-                authorKeys: []
+                authorKeys: [],
+                token: localStorage.getItem('authToken')
             };
 
             let authorKeys = [];
@@ -265,19 +265,11 @@ class Book extends React.Component {
 
             await RequestHandler.makeRequest(url, postData).then(
                 result => {
-
-                    // const result = words.filter(word => word.length > 6);
-
                     if (result.hasOwnProperty('data')) {
                         this.setState({
                             newFoundAuthors: result.data
                         })
                     }
-
-                    // this.setState({
-                    //     name: editingBookName,
-                    //     authorsOnServer: this.state.authorsToShow
-                    // })
                 }
             );
         }

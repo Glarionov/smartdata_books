@@ -16,7 +16,6 @@ class AuthorSeeder extends Seeder
     {
         foreach (['Jake', 'Jane', 'Sasha'] as $firstName) {
             foreach (['Black', 'White', 'Green'] as $lastName) {
-
                 DB::table('authors')->insert([
                     'first_name' => $firstName,
                     'last_name' => $lastName,

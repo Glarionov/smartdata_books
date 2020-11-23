@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use MarcinOrlowski\ResponseBuilder\ResponseBuilder as RB;
 use App\Helpers\ApiCode;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class AuthController extends Controller {
@@ -49,7 +50,7 @@ class AuthController extends Controller {
         }
 
         $userDataArray =  (array) $userDataObject;
-        $userDataArray['special_access'] = $specialAccess;
+        $userDataArray['specialAccess'] = $specialAccess;
         $userDataArray['user'] = (array) $userDataArray['user'];
 
         return RB::success(['data' => $userDataArray]);
@@ -107,12 +108,12 @@ class AuthController extends Controller {
     /**
      * Log the user out (Invalidate the token).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return Response
      */
     public function logout() {
         auth()->logout(true);
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return RB::success();
     }
 
     /**
@@ -148,5 +149,4 @@ class AuthController extends Controller {
             'user' => auth()->user()
         ]);
     }
-
 }

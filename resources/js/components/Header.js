@@ -5,10 +5,10 @@ import RequestHandler from "./helpers/RequestHandler";
 class Header extends React.Component {
     render() {
         return (
-            <div className="header-wrapper">
+            <header className="header-wrapper">
                 <div className="main-header-links">
 
-                    {this.props.specialAccess &&
+                    {this.state.specialAccess &&
                     <div className="all-books-link">
                         <a href={"/all_books/"}
                            onClick={this.changePage.bind(this, '/all_books/')}
@@ -18,7 +18,7 @@ class Header extends React.Component {
                     </div>
                     }
 
-                    {this.props.specialAccess &&
+                    {this.state.specialAccess &&
                     <div className="all-authors-link">
                         <a href={"/authors_control/"}
                            onClick={this.changePage.bind(this, '/authors_control/')}
@@ -59,24 +59,27 @@ class Header extends React.Component {
                         </div>
                         {this.state.signingIn &&
                         <div className="sign-in-forms">
+                            <form onSubmit={this.login.bind(this)}>
+
+
                             <div className="login-password-forms">
                                 <input type="text" placeholder="Login" value={this.state.signInLogin} onChange={this.handleChangeSignInLogin.bind(this)}  />
                                 <input type="password" placeholder="Password" value={this.state.signInPassword} onChange={this.handleChangeSignInPassword.bind(this)} />
                             </div>
 
                             <div className="login-buttons">
-                                <div className="custom-button" onClick={this.login.bind(this)}>
-                                    Log in
-                                </div>
+                                <input type="submit" className="custom-button" value="Log in" />
                                 <div className="sign-in-plink header-cancel-button custom-button" onClick={this.openSignIn.bind(this, false)}>
                                     Cancel
                                 </div>
                             </div>
+                            </form>
                         </div>
                         }
 
                         {this.state.signingUp &&
                         <div className="sign-up-forms">
+                            <form onSubmit={this.register.bind(this)}>
                             <div className="login-password-forms">
                                 <input type="text" placeholder="Login" value={this.state.signUpLogin}
                                        onChange={this.handleChangeSignUpLogin.bind(this)}/>
@@ -87,15 +90,13 @@ class Header extends React.Component {
                             </div>
 
                             <div className="login-buttons">
-                                <div className="custom-button" onClick={this.register.bind(this)}>
-                                    Register
-                                </div>
+                                <input type="submit" className="custom-button" value="Register" />
                                 <div className="sign-in-plink header-cancel-button custom-button"
                                      onClick={this.openSignUp.bind(this, false)}>
                                     Cancel
                                 </div>
                             </div>
-
+                            </form>
                         </div>
                         }
 
@@ -112,7 +113,7 @@ class Header extends React.Component {
                     </div>
                     }
                 </div>
-            </div>
+            </header>
         );
     }
 
@@ -128,13 +129,20 @@ class Header extends React.Component {
             signUpLogin: '',
             signUpPassword: '',
             signUpPasswordConfirm: '',
-            authMessage: ''
+            authMessage: '',
+            specialAccess: false
         }
 
         if (localStorage.getItem('login')) {
             this.state.isLogged = true;
             this.state.login = localStorage.getItem('login');
         }
+    }
+
+    componentDidMount() {
+        this.setState({
+            specialAccess: this.props.specialAccess
+        });
     }
 
     changePage(linkPart, event) {
@@ -176,7 +184,9 @@ class Header extends React.Component {
         this.setState({signUpPasswordConfirm: event.target.value});
     }
 
-    async login() {
+    async login(event) {
+        event.preventDefault();
+
         let login = this.state.signInLogin;
         let password = this.state.signInPassword;
 
@@ -186,9 +196,7 @@ class Header extends React.Component {
 
         await RequestHandler.makeRequest('auth/login', {login, password})
             .then(result => {
-                /*s*/console.log('result=', result); //todo r
                 if (result.error) {
-
                     switch (result.type) {
                         case 'warning_message':
                                 if (result.message === 'no user by login') {
@@ -204,8 +212,8 @@ class Header extends React.Component {
             });
     }
 
-    async register() {
-
+    async register(event) {
+        event.preventDefault();
         let login = this.state.signUpLogin;
         let password = this.state.signUpPassword;
         let passwordConfirm = this.state.signUpPasswordConfirm;
@@ -255,9 +263,6 @@ class Header extends React.Component {
     }
 
     handleLoginSuccess(userData, specialAccess = false) {
-
-        /*s*/console.log('userData=', userData); //todo r
-
         let token = userData.data.access_token;
         let userId = userData.data.user.id;
         let login = userData.data.user.login;
@@ -266,6 +271,10 @@ class Header extends React.Component {
         localStorage.setItem('userId', userId);
         localStorage.setItem('login', login);
         localStorage.setItem('specialAccess', userData.data.specialAccess);
+
+        if (userData.data.specialAccess) {
+            this.setState({specialAccess: true});
+        }
 
         this.props.changeUser(userId, specialAccess);
 
@@ -279,11 +288,6 @@ class Header extends React.Component {
     async logOut() {
 
         let token = localStorage.getItem('authToken');
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('login');
-        localStorage.removeItem('specialAccess');
-
         this.props.changeUser(0, false);
 
         this.setState({
@@ -295,7 +299,10 @@ class Header extends React.Component {
             {token}
             )
             .then(result => {
-
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('login');
+                localStorage.removeItem('specialAccess');
                 }
             )
             .catch(err => {
@@ -307,8 +314,14 @@ class Header extends React.Component {
 
     async componentDidUpdate(prevProps) {
         if (prevProps.userId !== this.props.userId) {
-            if (!this.props.userId) {
-                this.logOut();
+            if (!this.props.userId && this.state.isLogged) {
+                await this.logOut();
+            }
+        }
+
+        if (prevProps.specialAccess !== this.props.specialAccess) {
+            if (this.props.specialAccess) {
+                this.setState({specialAccess: true});
             }
         }
     }

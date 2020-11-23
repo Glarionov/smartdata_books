@@ -75,8 +75,26 @@ class AuthorController extends Controller
         return RB::success(['data' => $authors]);
     }
 
+
     /**
-     * Marks book as deleted
+     * Loads authors with their books' info
+     */
+    public function loadForUser() {
+
+        $authors = Author::all();
+
+        $result = $authors->toArray();
+
+        foreach ($authors as $id => $author) {
+            $books = $author->books()->get()->keyBy('id');
+            $result[$id]['books'] = $books;
+        }
+        return RB::success(['data' => $result]);
+    }
+
+
+    /**
+     * Marks author as deleted
      *
      * @param Request $request
      * @param int $authorId
