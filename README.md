@@ -1,8 +1,8 @@
-## Simple SPA CRUD, using laravel + reactjs
+# Simple SPA CRUD, using laravel + reactjs
 
 Starting project after pulling:
 
-# prepare:
+## prepare:
 
 - composer install
 - npm i
@@ -10,6 +10,9 @@ Starting project after pulling:
 - php artisan migrate
 - php artisan seed
 
-# To run app use:
+## To run app use:
 - php artisan serve
 - npm run watch
+
+## Admin
+Seeders create admin user with login and password "admin", you must be logged it as admin to gain access to change info
