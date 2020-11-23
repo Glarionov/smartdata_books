@@ -136,20 +136,12 @@ textarea, input[type="text"] {
     display: flex;
 }
 
-.book-adder-wrapper, .book-wrapper {
-    background: $bookWrapperColor;
-    padding: 20px;
-    width: 100%;
-
-    position: relative;
-    margin-top: 30px;
-}
-
-.author-info {
+.author-info, .book-adder-wrapper, .book-wrapper {
     background: $bookWrapperColor;
     width: 100%;
     padding: 1rem;
     margin-top: 1rem;
+    position: relative;
 }
 
 .new-book-adder-text {
