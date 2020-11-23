@@ -10,6 +10,6 @@ Starting project after pulling:
 - php artisan migrate
 - php artisan seed
 
-To run app use:
+#To run app use:
 - php artisan serve
 - npm run watch
