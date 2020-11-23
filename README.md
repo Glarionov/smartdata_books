@@ -1,15 +1,15 @@
-Simple SPA CRUD, using laravel + reactjs
+##Simple SPA CRUD, using laravel + reactjs
 
-starting project after pulling
+Starting project after pulling:
 
-prepare:
+#prepare:
 
-composer install
-npm i
-setup .env file
-php artisan migrate
-php artisan seed
+-composer install
+-npm i
+-setup .env file
+-php artisan migrate
+-php artisan seed
 
-run:
-php artisan serve
-npm run watch
+To run app use:
+-php artisan serve
+-npm run watch
